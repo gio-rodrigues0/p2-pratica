@@ -1,5 +1,9 @@
 import cv2
 
+face_cascade = cv2.CascadeClassifier(
+    filename=f"{cv2.data.haarcascades}/haarcascade_frontalface_default.xml"
+)
+
 # Abre o arquivo de video
 input_video = cv2.VideoCapture('../assets/arsene.mp4')
 
@@ -30,15 +34,25 @@ while True:
     if not ret:
         break
     
-    # Vamos editar o frame com um retangulo
-    cv2.rectangle(
-            img=frame,
-            pt1=(100, 100),
-            pt2=(300, 300),
-            color=(0,0,255),
-            thickness=5
-        )
+    gray_frame = cv2.cvtColor(src=frame, code=cv2.COLOR_BGR2GRAY)
 
+    # Vamos editar o frame com um retangulo
+    faces = face_cascade.detectMultiScale(
+        image=gray_frame, 
+        scaleFactor=1.05, # Mudança de escala a cada passada
+        minNeighbors=5 # Verifica os vizinhos antes de promover o ponto a ret
+    )
+
+    x, y, w, h = faces[0]
+
+    cv2.rectangle(
+    img=frame,
+    pt1=(x, y),
+    pt2=(x+w, y+h),
+    color=(0,0,255),
+    thickness=2
+    )   
+    
     # Exibe o frame
     cv2.imshow('Video Playback', frame)
     
